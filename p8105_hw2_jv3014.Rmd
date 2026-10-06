@@ -1,0 +1,12 @@
+---
+title: "p8105_hw2_jv3014"
+author: "Jia Varkey"
+date: "2026-10-06"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+
+```
+
+
