@@ -6,7 +6,17 @@ output: github_document
 ---
 
 ```{r setup, include=FALSE}
-
+library(tidyverse)
 ```
 
+# Problem 1
+
+```{r}
+transit_df = read_csv("./HW2Data/NYC_Transit.csv") |>
+  janitor::clean_names() |>
+  select(line, station_name, station_latitude, station_longitude, starts_with("route"), entry, vending, entrance_type, ada) |>
+  mutate(
+    entry = 
+  )
+```
 
