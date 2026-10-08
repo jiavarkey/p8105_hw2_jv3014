@@ -16,7 +16,147 @@ transit_df = read_csv("./HW2Data/NYC_Transit.csv") |>
   janitor::clean_names() |>
   select(line, station_name, station_latitude, station_longitude, starts_with("route"), entry, vending, entrance_type, ada) |>
   mutate(
-    entry = 
+    entry = case_match(entry, 
+                       "YES" ~ TRUE,
+                       "NO" ~ FALSE)
   )
+```
+
+The NYC Transit dataset contains
+
+## Problem 2
+
+```{r}
+trash_df = 
+  readxl::read_excel("./HW2Data/Trashwheel.xlsx", sheet = "Mr. Trash Wheel") |>
+  janitor::clean_names() |>
+  filter(!is.na(dumpster)) |>
+  select(-x15, -x16) |>
+  mutate(
+    sports_balls = 
+      as.integer(
+      round(sports_balls)),
+    wheel = "Mr. Trash Wheel",
+    year = as.numeric(year)
+  ) 
+
+prof_df =
+  readxl::read_excel("./HW2Data/Trashwheel.xlsx", sheet = "Professor Trash Wheel") |>
+  janitor::clean_names() |>
+  filter(!is.na(dumpster)) |>
+  mutate(wheel = "Professor Trash Wheel",
+         plastic_bottles = as.numeric(plastic_bottles))
+
+gwynnda_df =
+  readxl::read_excel("./HW2Data/Trashwheel.xlsx", sheet = "Gwynnda the Good Wheel of the W") |>
+  janitor::clean_names() |>
+  filter(!is.na(dumpster)) |>
+  mutate(wheel = "Gwynnda")
+
+# Combine datasets
+
+trashwheel_df = bind_rows(trash_df, prof_df, gwynnda_df) |>
+  janitor::clean_names()
+```
+
+```{r}
+prof_total_weight =
+  trashwheel_df |>
+  filter(wheel == "Professor Trash Wheel") |>
+  summarize(total_weight = sum(weight_tons, na.rm = TRUE)) |>
+  pull(total_weight)
+
+gwynnda_cig = 
+  trashwheel_df |>
+  filter(wheel == "Gwynnda",
+         year == 2022, 
+         month == "June") |>
+  summarize(total_cigarettes = sum(cigarette_butts, na.rm = TRUE)) |>
+  pull(total_cigarettes)
+```
+
+The combined trash wheel dataset contains a total of `r nrow(trashwheel_df)` observations tracking data across three trash wheels. Key variables include the total weight of the dumpster in tons as `weight_tons`, `volume_cubic_yards`, and different types of trash 
+collected such as `plastic_bottles`, `wrappers`, and `sports_balls`.
+
+Based on the available data, Professor Trash Wheel collected a total trash weight of `r prof_total_weight` tons and the total number of cigarette butts that Gwynnda collected in June 2022 is `r gwynnda_cig`. 
+
+rename(
+    ID = x1,
+    age = age_at_the_study_baseline,
+    sex = x1_male_0_female,
+    apoe4 = x1_apoe4_carrier_0_apoe4_non_carrier,
+    age_onset = age_at_the_onset_of_mci_missing_if_a_subject_remains_mci_free_during_the_follow_up_period
+  ) |>
+
+## Problem 3
+
+```{r}
+
+mci_baseline = 
+  read_csv("data_mci/MCI_baseline.csv", skip = 1, na = c("", "NA", "Na", "."))|>
+  janitor::clean_names() |>
+  
+  mutate(
+    sex = factor(
+      sex, 
+      levels = c(0,1),
+      labels = c("Female", "Male")
+      ),
+    
+    apoe4 = factor(
+      apoe4,
+      levels = c(0,1),
+      labels = c("Non-carrier", "Carrier")
+    )
+  ) 
+
+```
+
+
+
+```{r}
+avg_baseline_age = 
+  mci_baseline |>
+  summarize(mean_age = mean(current_age, na.rm = TRUE)) |>
+  pull(mean_age)
+
+
+women_prop =
+  mci_baseline |>
+  filter(sex == "Female") |>
+  summarise(mean(apoe4 == "Carrier"))
+  
+number_participants = nrow(mci_baseline) - 1
+
+developed_mci = 
+  mci_baseline |>
+  filter(!is.na(age_at_onset)) |>
+  nrow()
+```
+  
+The MCI baseline data set shows the onset and development of MCI. `r number_participants` people were recruited and from this sample, `r developed_mci ` developed MCI. The average baseline age is `r avg_baseline_age` and the proportion of women in the study who are carriers is `r women_prop`. 
+
+Import amyloid data 
+```{r}
+mci_amyloid =
+  read_csv("data_mci/mci_amyloid.csv", skip = 1, na = c("", "NA", "Na", ".")) |>
+  janitor::clean_names() |>
+  rename(
+    id = study_id,
+  )
+```
+
+```{r}
+anti_join(mci_baseline, mci_amyloid, by = "id") 
+anti_join(mci_amyloid, mci_baseline, by = "id")
+```
+
+8 participants in the baseline data do not have biomarker data. Whereas 16 of those in the amyloid data did not participate in the baseline data. 
+
+Check whether some participants appear in only the baseline or amyloid datasets, and comment on your findings. Combine the demographic and biomarker datasets so that only participants who appear in both datasets are retained, and briefly describe the resulting dataset; export the result as a CSV to your data directory.
+
+```{r}
+combined_mci = inner_join(mci_baseline, mci_amyloid, by = "id")
+write_csv(combined_mci,"data_mci/combined_mci.csv)")
 ```
 
