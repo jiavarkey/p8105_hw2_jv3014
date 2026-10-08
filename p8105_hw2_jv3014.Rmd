@@ -3,6 +3,9 @@ title: "p8105_hw2_jv3014"
 author: "Jia Varkey"
 date: "2026-10-06"
 output: github_document
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r setup, include=FALSE}
@@ -10,7 +13,6 @@ library(tidyverse)
 ```
 
 # Problem 1
-
 
 ```{r}
 transit_df = read_csv("./HW2Data/NYC_Transit.csv") |>
@@ -24,7 +26,6 @@ transit_df = read_csv("./HW2Data/NYC_Transit.csv") |>
 
 
 ```
-
 
 ```{r}
 distinct_station = 
@@ -46,7 +47,10 @@ total_no_vending =
 
 entrance_vend_prop = nrow(no_vending_entrance) / nrow(total_no_vending) * 100
 ```
-There are `r nrow(distinct_station)` distinct stations, with `r nrow(ada_compliant)` ADA compliant. `entrance_vend_prop`% of the stations with no vending allow entrance. 
+
+There are `r nrow(distinct_station)` distinct stations, with
+`r nrow(ada_compliant)` ADA compliant. `r entrance_vend_prop`% of the
+stations with no vending allow entrance.
 
 ```{r}
 
@@ -69,7 +73,9 @@ A_ada =
   distinct_A |>
   filter(ada==TRUE)
 ```
-There are `r nrow(distinct_A)` distinct stations that serve the A train. Of those stations, `r nrow(A_ada)` are ADA compliant. 
+
+There are `r nrow(distinct_A)` distinct stations that serve the A train.
+Of those stations, `r nrow(A_ada)` are ADA compliant.
 
 ## Problem 2
 
@@ -122,18 +128,16 @@ gwynnda_cig =
   pull(total_cigarettes)
 ```
 
-The combined trash wheel dataset contains a total of `r nrow(trashwheel_df)` observations tracking data across three trash wheels. Key variables include the total weight of the dumpster in tons as `weight_tons`, `volume_cubic_yards`, and different types of trash 
+The combined trash wheel dataset contains a total of
+`r nrow(trashwheel_df)` observations tracking data across three trash
+wheels. Key variables include the total weight of the dumpster in tons
+as `weight_tons`, `volume_cubic_yards`, and different types of trash
 collected such as `plastic_bottles`, `wrappers`, and `sports_balls`.
 
-Based on the available data, Professor Trash Wheel collected a total trash weight of `r prof_total_weight` tons and the total number of cigarette butts that Gwynnda collected in June 2022 is `r gwynnda_cig`. 
+Based on the available data, Professor Trash Wheel collected a total
+trash weight of `r prof_total_weight` tons and the total number of
+cigarette butts that Gwynnda collected in June 2022 is `r gwynnda_cig`.
 
-rename(
-    ID = x1,
-    age = age_at_the_study_baseline,
-    sex = x1_male_0_female,
-    apoe4 = x1_apoe4_carrier_0_apoe4_non_carrier,
-    age_onset = age_at_the_onset_of_mci_missing_if_a_subject_remains_mci_free_during_the_follow_up_period
-  ) |>
 
 ## Problem 3
 
@@ -159,8 +163,6 @@ mci_baseline =
 
 ```
 
-
-
 ```{r}
 avg_baseline_age = 
   mci_baseline |>
@@ -180,10 +182,15 @@ developed_mci =
   filter(!is.na(age_at_onset)) |>
   nrow()
 ```
-  
-The MCI baseline data set shows the onset and development of MCI. `r number_participants` people were recruited and from this sample, `r developed_mci ` developed MCI. The average baseline age is `r avg_baseline_age` and the proportion of women in the study who are carriers is `r women_prop`. 
 
-Import amyloid data 
+The MCI baseline data set shows the onset and development of MCI.
+`r number_participants` people were recruited and from this sample,
+`r developed_mci` developed MCI. The average baseline age is
+`r avg_baseline_age` and the proportion of women in the study who are
+carriers is `r women_prop`.
+
+Import amyloid data
+
 ```{r}
 mci_amyloid =
   read_csv("data_mci/mci_amyloid.csv", skip = 1, na = c("", "NA", "Na", ".")) |>
@@ -198,11 +205,11 @@ anti_join(mci_baseline, mci_amyloid, by = "id")
 anti_join(mci_amyloid, mci_baseline, by = "id")
 ```
 
-8 participants in the baseline data do not have biomarker data. Whereas 16 of those in the amyloid data did not participate in the baseline data. 
-
+8 participants in the baseline data do not have biomarker data. Whereas
+16 of those in the amyloid data did not participate in the baseline
+data.
 
 ```{r}
 combined_mci = inner_join(mci_baseline, mci_amyloid, by = "id")
-write_csv(combined_mci,"data_mci/combined_mci.csv)")
+write_csv(combined_mci,"data_mci/combined_mci.csv")
 ```
-
